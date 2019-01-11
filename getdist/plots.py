@@ -10,6 +10,7 @@ import warnings
 matplotlib.use('Agg', warn=False)
 from matplotlib import cm, rcParams
 import matplotlib.pyplot as plt
+from matplotlib.ticker import AutoMinorLocator
 import numpy as np
 from paramgrid import gridconfig, batchjob
 import getdist
@@ -1276,8 +1277,10 @@ class GetDistPlotter(object):
             if x and (abs(xmax - xmin) < 0.01 or max(abs(xmin), abs(xmax)) >= 1000):
                 maxN = int(self.settings.subplot_size_inch / 2) + 3
                 axis.set_major_locator(plt.MaxNLocator(maxN, prune=prune, steps=np.arange(1, 11)))
+                axis.set_minor_locator(AutoMinorLocator())
             else:
                 axis.set_major_locator(plt.MaxNLocator(int(self.settings.subplot_size_inch / 2) + 4, prune=prune))
+                axis.set_minor_locator(AutoMinorLocator())
 
     def _setAxisProperties(self, axis, x, prune=None):
         """
@@ -1345,7 +1348,7 @@ class GetDistPlotter(object):
         ax = ax or plt.gca()
         ax.set_xlabel(param.latexLabel(), fontsize=self.settings.lab_fontsize,
                       verticalalignment='baseline',
-                      labelpad=4 + self.settings.font_size)  # test_size because need a number not e.g. 'medium'
+                      labelpad=6 + self.settings.font_size)  # test_size because need a number not e.g. 'medium'
 
     def set_ylabel(self, param, ax=None):
         """
@@ -1444,6 +1447,9 @@ class GetDistPlotter(object):
         elif no_zero and not normalized:
             ticks = ax.get_yticks()
             if ticks[-1] > 1: ticks = ticks[:-1]
+            ax.set_yticks(ticks[1:])
+        elif no_zero:
+            ticks = ax.get_yticks()
             ax.set_yticks(ticks[1:])
 
     def make_figure(self, nplot=1, nx=None, ny=None, xstretch=1.0, ystretch=1.0):
@@ -2011,10 +2017,11 @@ class GetDistPlotter(object):
             self._inner_ticks(ax, False)
             self.plot_1d(roots1d, param, do_xlabel=i == plot_col - 1,
                          no_label_no_numbers=self.settings.no_triangle_axis_labels,
-                         label_right=True, no_zero=True, no_ylabel=True, no_ytick=True, line_args=line_args,
-                         lims=param_limits.get(param.name, None), **diag1d_kwargs)
+                         line_args=line_args, lims=param_limits.get(param.name, None), **diag1d_kwargs)
+            # set no_ylabel=True for now, can't see how to not screw up spacing with right-sided y label
             if self.settings.no_triangle_axis_labels:
                 self._spaceTicks(ax.xaxis, bounds=self._get_param_bounds(roots1d, param.name))
+
             lims[i] = ax.get_xlim()
             ticks[i] = ax.get_xticks()
         for i, param in enumerate(params):
@@ -2521,7 +2528,7 @@ class GetDistPlotter(object):
         args.update(kwargs)
         self.add_text(text_label, x, y, ax, **args)
 
-    def export(self, fname=None, adir=None, watermark=None, tag=None):
+    def export(self, fname=None, adir=None, watermark=None, tag=None, dpi=300):
         """
         Exports given figure to a file. If the filename is not specified, saves to a file with the same
         name as the calling script (useful for plot scripts where the script name matches the output figure).
@@ -2541,7 +2548,7 @@ class GetDistPlotter(object):
             self.fig.text(0.45, 0.5, escapeLatex(watermark), fontsize=30, color='gray', ha='center', va='center',
                           alpha=0.2)
 
-        self.fig.savefig(fname, bbox_extra_artists=self.extra_artists, bbox_inches='tight')
+        self.fig.savefig(fname, bbox_extra_artists=self.extra_artists, bbox_inches='tight', dpi=dpi)
 
     def _paramNameListFromFile(self, fname):
         """
