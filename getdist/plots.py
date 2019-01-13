@@ -1437,7 +1437,7 @@ class GetDistPlotter(object):
             if label_right:
                 ax.yaxis.set_label_position("right")
                 ax.yaxis.tick_right()
-                ax.set_ylabel(lab)
+                ax.set_ylabel(lab, fontsize=self.settings.lab_fontsize)
             else:
                 ax.set_ylabel(lab)
         if no_ytick or not self.settings.prob_y_ticks:
