@@ -964,7 +964,7 @@ class GetDistPlotter(object):
             kwargs = self._get_plot_args(plotno, **kwargs)
             kwargs['alpha'] = alpha
             CS = ax.contour(density.x, density.y, density.P, sorted(contour_levels), colors=cols, linestyles=linestyles,
-                            linewidths=self.settings.lw_contour, **clean_args(kwargs))
+                            linewidths=args['lw'], **clean_args(kwargs))
             dashes = args.get('dashes')
             if dashes:
                 for c in CS.collections:
