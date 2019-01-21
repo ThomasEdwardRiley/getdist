@@ -1277,10 +1277,8 @@ class GetDistPlotter(object):
             if x and (abs(xmax - xmin) < 0.01 or max(abs(xmin), abs(xmax)) >= 1000):
                 maxN = int(self.settings.subplot_size_inch / 2) + 3
                 axis.set_major_locator(plt.MaxNLocator(maxN, prune=prune, steps=np.arange(1, 11)))
-                axis.set_minor_locator(AutoMinorLocator())
             else:
                 axis.set_major_locator(plt.MaxNLocator(int(self.settings.subplot_size_inch / 2) + 4, prune=prune))
-                axis.set_minor_locator(AutoMinorLocator())
 
     def _setAxisProperties(self, axis, x, prune=None):
         """
@@ -1440,6 +1438,7 @@ class GetDistPlotter(object):
                 ax.set_ylabel(lab, fontsize=self.settings.lab_fontsize)
             else:
                 ax.set_ylabel(lab)
+        ax.yaxis.set_minor_locator(AutoMinorLocator())
         if no_ytick or not self.settings.prob_y_ticks:
             ax.set_yticks([])
         elif no_ylabel:
