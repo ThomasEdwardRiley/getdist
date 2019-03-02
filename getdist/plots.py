@@ -107,7 +107,7 @@ class GetDistPlotSettings(object):
         self.x_label_rotation = 0
         self.num_shades = 80
         self.shade_level_scale = 1.8  # contour levels at [0:1:spacing]**shade_level_scale
-        self.root_shade_index = 0
+        self.shade_root_index = 0
         self.fig_width_inch = fig_width_inch  # if you want to force specific fixed width
         self.progress = False
         self.tight_layout = True
