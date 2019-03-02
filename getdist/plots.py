@@ -107,6 +107,7 @@ class GetDistPlotSettings(object):
         self.x_label_rotation = 0
         self.num_shades = 80
         self.shade_level_scale = 1.8  # contour levels at [0:1:spacing]**shade_level_scale
+        self.root_shade_index = 0
         self.fig_width_inch = fig_width_inch  # if you want to force specific fixed width
         self.progress = False
         self.tight_layout = True
@@ -1153,7 +1154,9 @@ class GetDistPlotter(object):
             param1 = None
         param_pair = self.get_param_array(roots[0], param_pair or [param1, param2])
         if self.settings.progress: print('plotting: ', [param.name for param in param_pair])
-        if shaded and not kwargs.get('filled'): self.add_2d_shading(roots[0], param_pair[0], param_pair[1])
+        if shaded and not kwargs.get('filled'):
+            i = self.settings.shade_root_index
+            self.add_2d_shading(roots[i], param_pair[0], param_pair[1])
         xbounds, ybounds = None, None
         contour_args = self._make_contour_args(len(roots), **kwargs)
         for i, root in enumerate(roots):
@@ -1348,7 +1351,7 @@ class GetDistPlotter(object):
         ax = ax or plt.gca()
         ax.set_xlabel(param.latexLabel(), fontsize=self.settings.lab_fontsize,
                       verticalalignment='baseline',
-                      labelpad=6 + self.settings.font_size)  # test_size because need a number not e.g. 'medium'
+                      labelpad= 2.0*self.settings.font_size)  # test_size because need a number not e.g. 'medium'
 
     def set_ylabel(self, param, ax=None):
         """
