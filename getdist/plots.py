@@ -108,6 +108,8 @@ class GetDistPlotSettings(object):
         self.num_shades = 80
         self.shade_level_scale = 1.8  # contour levels at [0:1:spacing]**shade_level_scale
         self.shade_root_index = 0
+        self.rasterized_shade = False
+
         self.fig_width_inch = fig_width_inch  # if you want to force specific fixed width
         self.progress = False
         self.tight_layout = True
@@ -1013,7 +1015,10 @@ class GetDistPlotter(object):
             points = density.likes
         else:
             points = density.P
-        ax.contourf(density.x, density.y, points, self.settings.num_shades, colors=cols, levels=levels, **kwargs)
+        _ = ax.contourf(density.x, density.y, points, self.settings.num_shades, colors=cols, levels=levels, **kwargs)
+        for c in _.collections:
+            c.set_rasterized(self.settings.rasterized_shade)
+
         # doing contourf gets rid of annoying white lines in pdfs
         ax.contour(density.x, density.y, points, self.settings.num_shades, colors=cols, levels=levels, **kwargs)
 
@@ -1887,15 +1892,23 @@ class GetDistPlotter(object):
                 if bounds[0] is None or bounds[0] < xmin - 0.001 * width:
                     xmin = min(tick[0] - gap_wanted, xmin)
                 else:
-                    if tick[0] - xmin < gap_wanted: tick = tick[1:]
+                    if tick[0] - xmin < gap_wanted:
+                        axis.get_major_ticks()[0].label1.set_visible(False)
+                        #tick = tick[1:]
                 if bounds[1] is None or bounds[1] > xmax + 0.001 * width:
                     xmax = max(tick[-1] + gap_wanted, xmax)
                 else:
-                    if xmax - tick[-1] < gap_wanted: tick = tick[:-1]
+                    if xmax - tick[-1] < gap_wanted:
+                        axis.get_major_ticks()[-1].label1.set_visible(False)
+                        #tick = tick[:-1]
                 axis.set_view_interval(xmin, xmax)
             else:
-                if tick[0] - xmin < gap_wanted: tick = tick[1:]
-                if xmax - tick[-1] < gap_wanted: tick = tick[:-1]
+                if tick[0] - xmin < gap_wanted:
+                    axis.get_major_ticks()[0].label1.set_visible(False)
+                    #tick = tick[1:]
+                if xmax - tick[-1] < gap_wanted:
+                    axis.get_major_ticks()[-1].label1.set_visible(False)
+                    #tick = tick[:-1]
 
             if self.settings.thin_long_subplot_ticks and len(tick) > 2 and \
                     (abs(tick[-1] - tick[0]) < 0.01 or max(abs(xmin), abs(xmax)) >= 1000
